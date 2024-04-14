@@ -1,0 +1,12 @@
+{
+  "name": "pythonchatbotapi",
+  "version": "1.0.0",
+  "description": "Paradigmas de Programación, I Cuatrimestre 2024, Miércoles de 6:00 PM a 9:00 PM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
