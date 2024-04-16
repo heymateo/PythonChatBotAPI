@@ -1,25 +1,46 @@
 from flask import Flask, request, jsonify
-import openai
+from flask_cors import CORS
+import requests
 
 app = Flask(__name__)
+CORS(app)
 
-openai.api_key = ''
+@app.route('/openai', methods=['POST', 'OPTIONS'])
+def openai():
+    if request.method == 'OPTIONS':
+        response = jsonify({})
+        response.headers.add("Access-Control-Allow-Origin", "*")
+        response.headers.add("Access-Control-Allow-Methods", "POST, OPTIONS")
+        response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        return response
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    # Obtén el mensaje del usuario desde la solicitud POST
-    user_message = request.json['message']
+    try:
+        data = request.json
+        
+        requestData = {
+            "model": "gpt-3.5-turbo",
+            "messages": [
+                {"role": "system", "content": "Eres un asistente especializado en temas de Python únicamente."},
+                {"role": "user", "content": data.get("content")}
+            ],
+            "temperature": 0.7
+        }
 
-    # Envía el mensaje del usuario a la API de OpenAI para completado de chat
-    response = openai.Completion.create(
-        engine="text-davinci-003",
-        prompt=user_message,
-        max_tokens=100
-    )
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer " 
+        }
 
-    chatbot_reply = response.choices[0].text.strip()
+        response = requests.post("https://api.openai.com/v1/chat/completions", json=requestData, headers=headers)
+        
+        if response.status_code == 200:
+            responseData = response.json()
+            return jsonify(responseData), 200
+        else:
+            return jsonify({"error": "Error en la solicitud al API de OpenAI"}), response.status_code
 
-    return jsonify({'reply': chatbot_reply})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8800)

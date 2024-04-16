@@ -1,89 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect, useRef } from "react";
+import "./ChatInput.css";
+import axios from "axios";
 
-const ChatInput = () => {
-  const [input, setInput] = useState('');
+const Chat = () => {
+  const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const messageEndRef = useRef(null);
-  const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY;
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    
-    try {
-      const response = await axios.post('http://localhost:5000/chat', {
-        message: input
-      });
-      
-      console.log('Respuesta del chatbot:', response.data.reply);
-      
-      // Limpiar el campo de entrada después de enviar la pregunta
-      setInput('');
-    } catch (error) {
-      console.error('Error al enviar la pregunta:', error);
-    }
-  };
+  const [aiResponse, setAiResponse] = useState(""); // Nuevo estado para la respuesta del AI
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth"});
+    // Desplazar hacia abajo cada vez que cambian los mensajes
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleInputChange = (event) => {
     setInput(event.target.value);
   };
 
-  const handleSendMessage = async (txt = input) => {
-    if (txt.trim() === "" || loading) return;
-
-    setLoading(true);
+  const handleSendMessage = async () => {
+    if (input.trim() === "") return;
 
     try {
+      // Hacer una llamada a tu servidor backend en lugar de al API directamente
       const response = await axios.post("http://localhost:8800/openai", {
-        content: txt,
+        content: input,
       });
 
+      // Obtener la respuesta del servidor backend
       const botReply = response.data.choices[0].message.content;
-        setMessages((prevMessages) => [
+
+      // Actualizar los mensajes con la respuesta del AI
+      setMessages((prevMessages) => [
         ...prevMessages,
-        { text: txt, user: true },
-        { text: botReply, user: false},
+        { text: input, user: true },
+        { text: botReply, user: false },
       ]);
 
+      // Guardar la respuesta del AI en el estado
+      setAiResponse(botReply);
+
+      // Clear the input field
       setInput("");
     } catch (error) {
       console.error("Error sending message:", error);
-    } finally {
-      setLoading(false);
     }
-    return (
-      <div className="chat-container">
-        <div className="message-container">
-          {messages.map((msg, index) => (
-            <div
-              key={index}
-              className={msg.user ? "user-message" : "bot-message"}
-            >
-              {msg.text}
-              
-            </div>
-          ))}
-          <div ref={messageEndRef}></div>
-        </div>
-        <div className="input-container">
-          <input
-            type="text"
-            value={input}
-            onChange={handleInputChange}
-            placeholder="Pregunta cualquier cosa..."
-            disabled={loading}
-          />
-          <button onClick={handleSendMessage} disabled={loading}>
-            {loading ? "Enviando..." : "Enviar"}
-          </button>
-        </div>
-      </div>
-    );
   };
-}
-export default ChatInput;
+
+  const handleKeyPress = (event) => {
+    if (event.key === "Enter") {
+      handleSendMessage();
+    }
+  };
+
+  return (
+    <div className="chat-container">
+      <div className="message-container">
+        {messages.map((msg, index) => (
+          <div
+            key={index}
+            className={msg.user ? "user-message" : "bot-message"}
+          >
+            {msg.text}
+          </div>
+        ))}
+        <div ref={messagesEndRef}></div>
+      </div>
+      <div className="input-container">
+        <input
+          type="text"
+          value={input}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          placeholder="Preguntame..."
+        />
+        <button onClick={handleSendMessage}>Enviar</button>
+      </div>
+    </div>
+  );
+};
+
+export default Chat;

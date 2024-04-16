@@ -1,16 +1,13 @@
-import { useState } from 'react';
+import React from 'react';
+import ChatInput from './ChatInput.jsx';
 import './App.css';
-import ChatInput from './ChatInput';
 
 function App() {
   return (
-    <div className="chat-container">
-      <div className="message-container">
-        <h1>PythonChatBot</h1>
-      <ChatInput/>
-      </div>
+    <div className="app-container=">
+     <ChatInput/> 
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
