@@ -9,17 +9,24 @@ Prof. Michael. Romero N. - Universidad Fidélitas
 * Mateo Esquivel Rodríguez - mesquivel80154@ufide.ac.cr  
 * Bryan Vindas Marín - bvindas90748@ufide.ac.cr
 * Alberto Cascante Acuña - acascante10938@ufide.ac.cr
-* Cristopher Aguilar Fallas - 
+* Cristopher Aguilar Fallas - caguilar80853@ufide.ac.cr
 
 ## Descripción
-Proyecto hecho para ayudar a cualquier persona, sin importar su capacidad de audición o visión, para que pueda aprender sobre Python desde una interfaz interactiva de tipo ChatBot, donde incluirá una manera de enviar mensajes de voz y otra de recibir los mensajes dictados por el chat. Todo esto con la finalidad de desarrollar un proyecto que sea adaptable a otros sistemas y sea capaz de incluir a todo el público en su uso.
+Herramienta creada para ayudar a cualquier persona, sin importar su conocimiento, para que pueda aprender sobre Python desde una interfaz interactiva de tipo ChatBot. Todo esto con la finalidad de desarrollar un proyecto que sea adaptable a otros sistemas y sea capaz de incluir a todo el público en su uso.
 
 ## Características
 * Python
-* React
+* Cliente React
 * API OpenaAI
-* Accesible auditivamente
-* Accesible visualmente
+* NLP
+  
 ## Uso
+Puede ser utilizado para cualquier tipo de proyecto como forma de apoyar mejor los contenidos de aprendizaje.
 
 ## Configuración
+### API (PythonOpenAI)
+Instala Python: Seguir las instrucciones de instalación de Python en el entorno de desarrollo elegido.
+Configurar la API con su clave de OpenAI y otros detalles según sea necesario.
+### Cliente (React)
+Clona este repositorio.
+Ejecuta npm install para instalar las dependencias.
