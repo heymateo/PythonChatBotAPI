@@ -5,7 +5,9 @@ import './App.css';
 function App() {
   return (
     <div className="app-container=">
-     <ChatInput/> 
+      <div className="chat-content">
+      <ChatInput/> 
+      </div>
     </div>
   )
 }
