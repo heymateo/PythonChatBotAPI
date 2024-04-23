@@ -5,11 +5,12 @@ import axios from "axios";
 const Chat = () => {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
-  const [aiResponse, setAiResponse] = useState(""); // Nuevo estado para la respuesta del AI
+  const [loading, setLoading] = useState(false);
+  const [generatingResponse, setGeneratingResponse] = useState(false);
+  const [generatedText, setGeneratedText] = useState(""); // Estado para el texto generado
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    // Desplazar hacia abajo cada vez que cambian los mensajes
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
@@ -18,31 +19,46 @@ const Chat = () => {
   };
 
   const handleSendMessage = async () => {
-    if (input.trim() === "") return;
+    if (input.trim() === "" || loading) return;
+
+    setLoading(true);
+    setGeneratingResponse(true);
+
+    // Mostrar la pregunta mientras se genera la respuesta
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text: input, user: true },
+    ]);
 
     try {
-      // Hacer una llamada a tu servidor backend en lugar de al API directamente
       const response = await axios.post("http://localhost:8800/openai", {
         content: input,
       });
 
-      // Obtener la respuesta del servidor backend
       const botReply = response.data.choices[0].message.content;
 
-      // Actualizar los mensajes con la respuesta del AI
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { text: input, user: true },
-        { text: botReply, user: false },
-      ]);
+      // Simular la generación gradual del texto
+      let currentIndex = 0;
+      const timer = setInterval(() => {
+        if (currentIndex <= botReply.length) {
+          setGeneratedText(botReply.substring(0, currentIndex));
+          currentIndex += 3; // Ajusta el incremento para acelerar la generación
+        } else {
+          clearInterval(timer);
+          setMessages((prevMessages) => [
+            ...prevMessages,
+            { text: botReply, user: false },
+          ]);
+          setInput("");
+          setLoading(false);
+          setGeneratingResponse(false);
+        }
+      }, 50); // Velocidad de generación ajustable
 
-      // Guardar la respuesta del AI en el estado
-      setAiResponse(botReply);
-
-      // Clear the input field
-      setInput("");
     } catch (error) {
       console.error("Error sending message:", error);
+      setLoading(false);
+      setGeneratingResponse(false);
     }
   };
 
@@ -63,6 +79,9 @@ const Chat = () => {
             {msg.text}
           </div>
         ))}
+        {generatingResponse && (
+          <div className="bot-message">{generatedText}</div>
+        )}
         <div ref={messagesEndRef}></div>
       </div>
       <div className="input-container">
@@ -70,10 +89,13 @@ const Chat = () => {
           type="text"
           value={input}
           onChange={handleInputChange}
-          onKeyPress={handleKeyPress}
-          placeholder="Preguntame..."
+          onKeyDown={handleKeyPress}
+          placeholder="Pregúntame"
+          disabled={loading}
         />
-        <button onClick={handleSendMessage}>Enviar</button>
+        <button onClick={handleSendMessage} disabled={loading}>
+          {loading ? "Enviando..." : "Enviar"}
+        </button>
       </div>
     </div>
   );
